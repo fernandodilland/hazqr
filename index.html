@@ -99,7 +99,7 @@
 </head>
 <body>
     <h1>Haz tu código QR online, rápido, gratis y sin anuncios</h1>
-    <p>Genera tu código QR para URL, WhatsApp, Menú Digital, Teléfono, Texto, Geolocalización y Wi-Fi</p>
+    <p>Genera tu código QR para URL, WhatsApp, Menú Digital, Teléfono, Texto, Geolocalización, Google Maps y Wi-Fi</p>
     <div class="container">
         <div class="options">
             <label for="type">Seleccione el tipo de código QR:</label><br>
@@ -112,6 +112,7 @@
                 <option value="text">Texto simple</option>
                 <option value="location">Geolocalización</option>
                 <option value="wifi">Red Wifi</option>
+                <option value="maps">Google Maps</option> <!-- Nueva opción agregada -->
             </select><br>
             <label for="content">Ingrese la información:</label><br>
             <input type="text" id="content" name="content" placeholder="https://..."><br>
@@ -181,12 +182,14 @@
                     var longitude = additionalFields.querySelector("#location-longitude").value;
                     return generateGeoLocationLink(latitude, longitude);
                 case "wifi":
-                    var wifiName = additionalFields.querySelector("#wifi-name").value;
+                    var wifiName = contentInput.value;
                     var wifiPassword = additionalFields.querySelector("#wifi-password").value;
                     var wifiSecurity = additionalFields.querySelector("#wifi-security").value;
                     return generateWifiLink(wifiName, wifiPassword, wifiSecurity);
                 case "drive":
                     return contentInput.value;
+                case "maps": // Nueva opción agregada
+                    return generateGoogleMapsLink(contentInput.value);
                 default:
                     return addHTTPProtocol(contentInput.value);
             }
@@ -229,9 +232,8 @@
                     `;
                     break;
                 case "wifi":
-                    contentInput.placeholder = "Ingresa el nombre de la red";
+                    contentInput.placeholder = "Nombre de la red";
                     additionalFields.innerHTML = `
-                        <input type="text" id="wifi-name" name="wifi-name" placeholder="Nombre de la red"><br>
                         <input type="text" id="wifi-password" name="wifi-password" placeholder="Contraseña"><br>
                         <select id="wifi-security" name="wifi-security">
                             <option value="WPA">WPA</option>
@@ -242,6 +244,10 @@
                     break;
                 case "drive":
                     contentInput.placeholder = "https://drive.google.com/drive/folders/...";
+                    additionalFields.innerHTML = "";
+                    break;
+                case "maps": // Nueva opción agregada
+                    contentInput.placeholder = "Dirección";
                     additionalFields.innerHTML = "";
                     break;
                 default:
@@ -285,6 +291,11 @@
             } else {
                 link += "T:" + security + ";;";
             }
+            return link;
+        }
+        
+        function generateGoogleMapsLink(address) {
+            var link = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(address);
             return link;
         }
     </script>
