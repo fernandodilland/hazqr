@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Haz tu código QR online, rápido, gratis y sin anuncios</title>
+    <style>
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        p {
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            margin-top: 50px;
+        }
+
+        .options {
+            width: 300px;
+            margin-right: 30px;
+        }
+
+        .options label,
+        .options select,
+        .options button {
+            width: 100%;
+        }
+
+        .options input[type="text"],
+        .options select {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+
+        .options button {
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .qr {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 50px;
+            width: 100%;
+        }
+
+        .download-button {
+            text-align: center;
+            margin-top: 20px;
+            max-width: 250px;
+            margin: 0 auto;
+        }
+
+        .download-button a {
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .qr-canvas-wrapper {
+            max-width: 800px;
+            max-height: 800px;
+            margin: 0 auto;
+        }
+
+        @font-face {
+            font-family: 'Poppins';
+            src: url('recursos/Poppins-Regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Poppins';
+            src: url('recursos/Poppins-SemiBold.ttf') format('truetype');
+            font-weight: bold;
+            font-style: normal;
+        }
+    </style>
+    <script src="recursos/qrious.min.js"></script>
+</head>
+<body>
+    <h1>Haz tu código QR online, rápido, gratis y sin anuncios</h1>
+    <p>Genera tu código QR para URL, WhatsApp, Menú Digital, Teléfono, Texto, Geolocalización y Wi-Fi</p>
+    <div class="container">
+        <div class="options">
+            <label for="type">Seleccione el tipo de código QR:</label><br>
+            <select id="type" name="type" onchange="changePlaceholder()">
+                <option value="url">URL</option>
+                <option value="whatsapp">WhatsApp</option>
+                <option value="drive">Menú digital (Google Drive)</option>
+                <option value="sms">Mensaje de texto SMS</option>
+                <option value="phone">Teléfono</option>
+                <option value="text">Texto simple</option>
+                <option value="location">Geolocalización</option>
+                <option value="wifi">Red Wifi</option>
+            </select><br>
+            <label for="content">Ingrese la información:</label><br>
+            <input type="text" id="content" name="content" placeholder="https://..."><br>
+            <div id="additional-fields"></div>
+            <label for="size">Seleccione un tamaño:</label><br>
+            <select id="size" name="size">
+                <option value="100x100">100x100</option>
+                <option value="200x200">200x200</option>
+                <option value="300x300">300x300</option>
+                <option value="500x500" selected>500x500</option>
+            </select><br>
+            <button onclick="generateQRCode()">Generar código QR</button>
+        </div>
+    </div>
+    <div class="qr">
+        <div class="qr-canvas-wrapper">
+            <canvas id="qr-canvas"></canvas>
+        </div>
+    </div>
+    <div class="download-button">
+        <a id="download-link" href="#" download="qr.png" style="display: none;">Descargar código QR</a>
+    </div>
+
+    <script>
+        function generateQRCode() {
+            var typeSelect = document.getElementById("type");
+            var contentInput = document.getElementById("content");
+            var additionalFields = document.getElementById("additional-fields");
+            var qrCodeCanvas = document.getElementById("qr-canvas");
+            var downloadLink = document.getElementById("download-link");
+
+            var content = contentInput.value;
+            var size = document.getElementById("size").value;
+
+            var qr = new QRious({
+                element: qrCodeCanvas,
+                value: generateQRValue(),
+                size: parseInt(size.split("x")[0]),
+            });
+
+            downloadLink.href = qr.toDataURL();
+            downloadLink.style.display = "block";
+        }
+
+        function generateQRValue() {
+            var typeSelect = document.getElementById("type");
+            var contentInput = document.getElementById("content");
+            var additionalFields = document.getElementById("additional-fields");
+
+            switch (typeSelect.value) {
+                case "url":
+                    return addHTTPProtocol(contentInput.value);
+                case "whatsapp":
+                    var phoneNumber = contentInput.value;
+                    var message = additionalFields.querySelector("#whatsapp-message").value;
+                    return generateWhatsAppLink(phoneNumber, message);
+                case "sms":
+                    var phoneNumber = contentInput.value;
+                    var message = additionalFields.querySelector("#sms-message").value;
+                    return generateSMSLink(phoneNumber, message);
+                case "phone":
+                    return "tel:" + contentInput.value;
+                case "text":
+                    return contentInput.value;
+                case "location":
+                    var latitude = contentInput.value;
+                    var longitude = additionalFields.querySelector("#location-longitude").value;
+                    return generateGeoLocationLink(latitude, longitude);
+                case "wifi":
+                    var wifiName = additionalFields.querySelector("#wifi-name").value;
+                    var wifiPassword = additionalFields.querySelector("#wifi-password").value;
+                    var wifiSecurity = additionalFields.querySelector("#wifi-security").value;
+                    return generateWifiLink(wifiName, wifiPassword, wifiSecurity);
+                case "drive":
+                    return contentInput.value;
+                default:
+                    return addHTTPProtocol(contentInput.value);
+            }
+        }
+
+        function changePlaceholder() {
+            var typeSelect = document.getElementById("type");
+            var contentInput = document.getElementById("content");
+            var additionalFields = document.getElementById("additional-fields");
+
+            switch (typeSelect.value) {
+                case "url":
+                    contentInput.placeholder = "Dirección URL";
+                    additionalFields.innerHTML = "";
+                    break;
+                case "whatsapp":
+                    contentInput.placeholder = "Número de WhatsApp";
+                    additionalFields.innerHTML = `
+                        <input type="text" id="whatsapp-message" name="whatsapp-message" placeholder="Mensaje (opcional)"><br>
+                    `;
+                    break;
+                case "sms":
+                    contentInput.placeholder = "Número de teléfono";
+                    additionalFields.innerHTML = `
+                        <input type="text" id="sms-message" name="sms-message" placeholder="Mensaje"><br>
+                    `;
+                    break;
+                case "phone":
+                    contentInput.placeholder = "Ingresa el número de teléfono";
+                    additionalFields.innerHTML = "";
+                    break;
+                case "text":
+                    contentInput.placeholder = "Ingresa el texto";
+                    additionalFields.innerHTML = "";
+                    break;
+                case "location":
+                    contentInput.placeholder = "Latitud";
+                    additionalFields.innerHTML = `
+                        <input type="text" id="location-longitude" name="location-longitude" placeholder="Longitud"><br>
+                    `;
+                    break;
+                case "wifi":
+                    contentInput.placeholder = "Ingresa el nombre de la red";
+                    additionalFields.innerHTML = `
+                        <input type="text" id="wifi-name" name="wifi-name" placeholder="Nombre de la red"><br>
+                        <input type="text" id="wifi-password" name="wifi-password" placeholder="Contraseña"><br>
+                        <select id="wifi-security" name="wifi-security">
+                            <option value="WPA">WPA</option>
+                            <option value="WEP">WEP</option>
+                            <option value="Ninguna">Ninguna</option>
+                        </select><br>
+                    `;
+                    break;
+                case "drive":
+                    contentInput.placeholder = "https://drive.google.com/drive/folders/...";
+                    additionalFields.innerHTML = "";
+                    break;
+                default:
+                    contentInput.placeholder = "Dirección URL";
+                    additionalFields.innerHTML = "";
+                    break;
+            }
+        }
+
+        function addHTTPProtocol(url) {
+            if (url && !url.match(/^https?:\/\//i)) {
+                url = "http://" + url;
+            }
+            return url;
+        }
+
+        function generateWhatsAppLink(phoneNumber, message) {
+            var link = "https://wa.me/" + phoneNumber.replace(/[^\d.]/g, "");
+            if (message) {
+                link += "?text=" + encodeURIComponent(message);
+            }
+            return link;
+        }
+
+        function generateSMSLink(phoneNumber, message) {
+            var link = "sms:" + phoneNumber.replace(/[^\d.]/g, "");
+            if (message) {
+                link += "&body=" + encodeURIComponent(message);
+            }
+            return link;
+        }
+
+        function generateGeoLocationLink(latitude, longitude) {
+            return "geo:" + encodeURIComponent(latitude) + "," + encodeURIComponent(longitude) + ",500";
+        }
+
+        function generateWifiLink(name, password, security) {
+            var link = "WIFI:S:" + encodeURIComponent(name) + ";";
+            if (password) {
+                link += "T:" + security + ";P:" + encodeURIComponent(password) + ";;";
+            } else {
+                link += "T:" + security + ";;";
+            }
+            return link;
+        }
+    </script>
+</body>
+</html>
