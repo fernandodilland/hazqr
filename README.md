@@ -6,7 +6,7 @@
 - Disponible en: https://hazqr.com/ (CNAME apuntado de https://hazqr.pages.dev/)
 
 ## Detalles técnicos
-- Hospedado en [Cloudflare Pages](https://github.com/fernandodilland/hazqr/blob/main/LICENSE](https://pages.cloudflare.com/)
+- Hospedado en [Cloudflare Pages](https://pages.cloudflare.com/)
 
 ## Changelog
 
