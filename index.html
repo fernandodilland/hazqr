@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Haz tu código QR online, rápido, gratis y sin anuncios</title>
+    <link rel="icon" href="recursos/favicon.png"> <!-- Agregando el favicon -->
     <style>
         body {
             font-family: 'Poppins', Arial, sans-serif;
@@ -137,6 +138,7 @@
     </div>
 
     <script>
+        // Función para generar el código QR
         function generateQRCode() {
             var typeSelect = document.getElementById("type");
             var contentInput = document.getElementById("content");
@@ -157,6 +159,7 @@
             downloadLink.style.display = "block";
         }
 
+        // Función para generar el valor del código QR en base al tipo seleccionado
         function generateQRValue() {
             var typeSelect = document.getElementById("type");
             var contentInput = document.getElementById("content");
@@ -195,6 +198,7 @@
             }
         }
 
+        // Función para cambiar el marcador de posición según el tipo seleccionado
         function changePlaceholder() {
             var typeSelect = document.getElementById("type");
             var contentInput = document.getElementById("content");
@@ -257,6 +261,7 @@
             }
         }
 
+        // Función para agregar el protocolo HTTP a una URL si no está presente
         function addHTTPProtocol(url) {
             if (url && !url.match(/^https?:\/\//i)) {
                 url = "http://" + url;
@@ -264,6 +269,7 @@
             return url;
         }
 
+        // Función para generar el enlace de WhatsApp
         function generateWhatsAppLink(phoneNumber, message) {
             var link = "https://wa.me/" + phoneNumber.replace(/[^\d.]/g, "");
             if (message) {
@@ -272,6 +278,7 @@
             return link;
         }
 
+        // Función para generar el enlace de mensaje de texto SMS
         function generateSMSLink(phoneNumber, message) {
             var link = "sms:" + phoneNumber.replace(/[^\d.]/g, "");
             if (message) {
@@ -280,10 +287,12 @@
             return link;
         }
 
+        // Función para generar el enlace de geolocalización
         function generateGeoLocationLink(latitude, longitude) {
             return "geo:" + encodeURIComponent(latitude) + "," + encodeURIComponent(longitude) + ",500";
         }
 
+        // Función para generar el enlace de red WiFi
         function generateWifiLink(name, password, security) {
             var link = "WIFI:S:" + encodeURIComponent(name) + ";";
             if (password) {
@@ -293,10 +302,10 @@
             }
             return link;
         }
-        
+
+        // Función para generar el enlace de Google Maps
         function generateGoogleMapsLink(address) {
-            var link = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(address);
-            return link;
+            return "https://www.google.com/maps/search/" + encodeURIComponent(address);
         }
     </script>
 </body>
