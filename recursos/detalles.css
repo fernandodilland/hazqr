@@ -888,6 +888,12 @@ responsive
   .main-banner {
     padding-top: 20px;
   }
+  .main-banner .left-content h2 {
+    font-size: 35px;
+    font-weight: 700;
+    color: #2a2a2a;
+    line-height: 72px;
+  }
   .main-banner .left-content {
     margin-right: 0px;
     text-align: center;
