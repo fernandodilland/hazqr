@@ -886,7 +886,7 @@ responsive
 
 @media (max-width: 992px) {
   .main-banner {
-    padding-top: 196px;
+    padding-top: 20px;
   }
   .main-banner .left-content {
     margin-right: 0px;
