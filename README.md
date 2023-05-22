@@ -19,4 +19,4 @@ Features:
 
 ## License
 
-[hazqr](https://github.com/fernandodilland/hazqr/blob/main/LICENSE) are released under [MIT license](https://github.com/fernandodilland/hazqr/blob/main/LICENSE) . Copyright (c) [Fernando Dilland Mireles Cisneros](https://github.com/fernandodilland).
+[hazqr](https://github.com/fernandodilland/hazqr/blob/main/LICENSE) are released under [MIT license](https://github.com/fernandodilland/hazqr/blob/main/LICENSE) . Copyright (C) 2023 [Fernando Dilland Mireles Cisneros](https://github.com/fernandodilland).
