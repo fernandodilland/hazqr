@@ -15,7 +15,6 @@
     }
   });
 
-
 	$('.owl-our-team').owlCarousel({
 		items:3,
 		loop:true,
@@ -39,7 +38,6 @@
 		  }
 	})
 	
-
 	// Menu Dropdown Toggle
   if($('.menu-trigger').length){
     $(".menu-trigger").on('click', function() { 
@@ -108,17 +106,6 @@
       });
   }
 
-
-
-	// Page loading animation
-	 $(window).on('load', function() {
-
-        $('#js-preloader').addClass('loaded');
-
-    });
-
-	
-
 	// Window Resize Mobile Menu Fix
   function mobileNav() {
     var width = $(window).width();
@@ -129,8 +116,5 @@
       }
     });
   }
-
-
-
 
 })(window.jQuery);
