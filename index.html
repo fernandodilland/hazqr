@@ -344,6 +344,10 @@
         var type = 'url';
         var hash = window.location.hash.replace('#', '');
         var btns = document.querySelectorAll('#type-btn-group button');
+        var options = document.querySelector('.options');
+        if (options) {
+            options.hidden = false;
+        }
         if (hash) {
             var btn = Array.from(btns).find(b => b.getAttribute('data-type') === hash);
             if (btn) {
@@ -355,11 +359,6 @@
         var contentInput = document.getElementById('content');
         if (contentInput) {
             contentInput.focus();
-        }
-        // Mostrar las opciones después de procesar el hash
-        var options = document.querySelector('.options');
-        if (options) {
-            options.hidden = false;
         }
     });
     // --- FIN: Sincronizar select con hash de la URL ---
