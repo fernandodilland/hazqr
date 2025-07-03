@@ -88,6 +88,23 @@
             flex-shrink: 0;
         }
 
+        #share-toast {
+          background: linear-gradient(90deg, #27ae60 0%, #2ecc71 100%);
+          color: #fff;
+          box-shadow: 0 4px 24px 0 rgba(39, 174, 96, 0.15);
+          border-radius: 0.75rem;
+          font-size: 1rem;
+          border: none;
+          opacity: 0.97;
+          transition: box-shadow 0.2s;
+        }
+        #share-toast .toast-body {
+          font-weight: 500;
+          letter-spacing: 0.01em;
+        }
+        #share-toast .btn-close {
+          filter: invert(1) grayscale(1) brightness(2);
+        }
     </style>
   </head>
 <body>
@@ -131,14 +148,30 @@
               </div>
             </div>
             <div class="col-lg-6">
-              <div class="right-image wow fadeInRight">
+              <div class="right-image">
                 <div class="qr">
                   <div class="qr-canvas-wrapper">
                       <canvas id="qr-canvas"></canvas>
                   </div>
               </div>
-              <div class="download-button">
-                  <a id="download-link"   class="btn btn-primary" href="#" download="qr.png" style="display: none;">Descargar código QR</a>
+              <div class="download-button row g-2 justify-content-center">
+                  <div class="col-12 col-md-6 d-grid">
+                    <a id="download-link" class="btn btn-primary" href="#" download="qr.png" style="display: none;"><i class="fas fa-download"></i> Descargar</a>
+                  </div>
+                  <div class="col-12 col-md-6 d-grid">
+                    <button id="share-link" class="btn btn-outline-secondary" style="display: none;" onclick="copyShareURL(event)"><i class="fas fa-share"></i> Compartir</button>
+                  </div>
+              </div>
+              <div id="share-url-container" class="mt-2" style="display:none;">
+                <input id="share-url" class="form-control text-center" readonly style="font-size:0.95rem;" />
+              </div>
+              <div id="share-toast" class="toast align-items-center text-bg-success border-0 position-fixed bottom-0 end-0 m-3" role="alert" aria-live="assertive" aria-atomic="true" style="z-index:9999; min-width:220px; display:none; white-space:nowrap;">
+                <div class="d-flex align-items-center">
+                  <div class="toast-body p-2">
+                    <i class="fas fa-check-circle me-2"></i>El enlace se ha copiado exitosamente
+                  </div>
+                  <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close" onclick="hideShareToast()"></button>
+                </div>
               </div>
               </div>
             </div>
@@ -189,6 +222,51 @@
 
         downloadLink.href = qr.toDataURL();
         downloadLink.style.display = "block";
+
+        // Mostrar el botón de compartir cuando se genera el QR y actualizar su enlace
+        var shareLink = document.getElementById("share-link");
+        shareLink.dataset.url = generateShareURL();
+        shareLink.style.display = "block";
+        shareLink.innerHTML = '<i class="fas fa-share"></i> Compartir';
+        var downloadLink = document.getElementById("download-link");
+        downloadLink.innerHTML = '<i class="fas fa-download"></i> Descargar';
+    }
+
+    // Genera la URL para compartir el QR con los datos actuales
+    function generateShareURL() {
+        var type = document.getElementById('type').value;
+        var hash = '#' + type;
+        var params = [];
+        var content = document.getElementById('content').value;
+        if (content) params.push('1=' + encodeURIComponent(content));
+        var additionalFields = document.getElementById('additional-fields');
+        // Según el tipo, agregar los campos adicionales
+        switch (type) {
+            case 'whatsapp':
+                var msg = additionalFields.querySelector('#whatsapp-message')?.value;
+                if (msg) params.push('2=' + encodeURIComponent(msg));
+                break;
+            case 'sms':
+                var msg = additionalFields.querySelector('#sms-message')?.value;
+                if (msg) params.push('2=' + encodeURIComponent(msg));
+                break;
+            case 'location':
+                var lng = additionalFields.querySelector('#location-longitude')?.value;
+                if (lng) params.push('2=' + encodeURIComponent(lng));
+                break;
+            case 'wifi':
+                var pwd = additionalFields.querySelector('#wifi-password')?.value;
+                var sec = additionalFields.querySelector('#wifi-security')?.value;
+                if (pwd) params.push('2=' + encodeURIComponent(pwd));
+                if (sec) params.push('3=' + encodeURIComponent(sec));
+                break;
+        }
+        // Tamaño
+        var size = document.getElementById('size').value;
+        if (size) params.push('s=' + encodeURIComponent(size));
+        var url = window.location.origin + window.location.pathname + hash;
+        if (params.length > 0) url += '&' + params.join('&');
+        return url;
     }
 
     // Función para generar el valor del código QR en base al tipo seleccionado
@@ -380,6 +458,88 @@
         if (contentInput) {
             contentInput.focus();
         }
+    }
+    // --- NUEVO: Llenar campos desde la URL si hay parámetros ---
+    document.addEventListener('DOMContentLoaded', function() {
+        // ...existing code...
+        // --- NUEVO: Llenar campos desde la URL si hay parámetros ---
+        var hash = window.location.hash;
+        if (hash && hash.includes('&')) {
+            var [mainHash, ...paramParts] = hash.slice(1).split('&');
+            var params = {};
+            paramParts.forEach(function(p) {
+                var [k, v] = p.split('=');
+                params[k] = decodeURIComponent(v || '');
+            });
+            // Seleccionar tipo
+            var btns = document.querySelectorAll('#type-btn-group button');
+            var btn = Array.from(btns).find(b => b.getAttribute('data-type') === mainHash);
+            if (btn) selectQRType(btn);
+            // Llenar campos
+            setTimeout(function() {
+                if (params['1']) document.getElementById('content').value = params['1'];
+                var type = mainHash;
+                var additionalFields = document.getElementById('additional-fields');
+                switch (type) {
+                    case 'whatsapp':
+                        if (params['2']) additionalFields.querySelector('#whatsapp-message').value = params['2'];
+                        break;
+                    case 'sms':
+                        if (params['2']) additionalFields.querySelector('#sms-message').value = params['2'];
+                        break;
+                    case 'location':
+                        if (params['2']) additionalFields.querySelector('#location-longitude').value = params['2'];
+                        break;
+                    case 'wifi':
+                        if (params['2']) additionalFields.querySelector('#wifi-password').value = params['2'];
+                        if (params['3']) additionalFields.querySelector('#wifi-security').value = params['3'];
+                        break;
+                }
+                if (params['s']) document.getElementById('size').value = params['s'];
+                generateQRCode();
+            }, 100); // Espera breve para que los campos existan
+        }
+    });
+    function copyShareURL(e) {
+        e.preventDefault();
+        var shareLink = document.getElementById("share-link");
+        var url = shareLink.dataset.url;
+        // Mostrar el enlace en el input
+        var shareUrlContainer = document.getElementById('share-url-container');
+        var shareUrlInput = document.getElementById('share-url');
+        shareUrlInput.value = url;
+        shareUrlContainer.style.display = 'block';
+        // Cambiar el hash de la URL actual para que el enlace sea visible en la barra de direcciones
+        if (window.location.hash !== url.split(window.location.pathname)[1]) {
+            window.location.hash = url.split(window.location.pathname)[1];
+        }
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(url).then(function() {
+                showShareToast();
+            });
+        } else {
+            // Fallback
+            var temp = document.createElement('input');
+            document.body.appendChild(temp);
+            temp.value = url;
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            showShareToast();
+        }
+    }
+    function showShareToast() {
+        var toast = document.getElementById('share-toast');
+        toast.style.display = 'block';
+        toast.classList.add('show');
+        setTimeout(function(){
+            hideShareToast();
+        }, 2500);
+    }
+    function hideShareToast() {
+        var toast = document.getElementById('share-toast');
+        toast.style.display = 'none';
+        toast.classList.remove('show');
     }
   </script>
 
