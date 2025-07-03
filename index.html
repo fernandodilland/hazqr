@@ -325,6 +325,27 @@
     function generateGoogleMapsLink(address) {
         return "https://www.google.com/maps/search/" + encodeURIComponent(address);
     }
+
+    // --- INICIO: Sincronizar select con hash de la URL ---
+    // Actualiza el hash al cambiar la opción
+    document.addEventListener('DOMContentLoaded', function() {
+        var typeSelect = document.getElementById('type');
+        // Al cambiar el select, actualiza el hash
+        typeSelect.addEventListener('change', function() {
+            window.location.hash = '#' + typeSelect.value;
+        });
+
+        // Al cargar la página, si hay hash, selecciona la opción correspondiente
+        var hash = window.location.hash.replace('#', '');
+        if (hash) {
+            var option = Array.from(typeSelect.options).find(opt => opt.value === hash);
+            if (option) {
+                typeSelect.value = hash;
+                changePlaceholder(); // Actualiza placeholder y campos adicionales
+            }
+        }
+    });
+    // --- FIN: Sincronizar select con hash de la URL ---
   </script>
 
 </body>
