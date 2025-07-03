@@ -204,7 +204,7 @@
   <!-- Script para generación de Código QR -->
   <script>
     // Función para generar el código QR
-    function generateQRCode() {
+    function generateQRCode(updateHash = true) {
         var typeSelect = document.getElementById("type");
         var contentInput = document.getElementById("content");
         var additionalFields = document.getElementById("additional-fields");
@@ -238,10 +238,12 @@
         shareUrlInput.value = shareUrl;
         shareUrlContainer.style.display = 'block';
 
-        // Actualizar el hash de la URL con todos los parámetros
-        var hashPart = shareUrl.split(window.location.pathname)[1];
-        if (window.location.hash !== hashPart) {
-            window.location.hash = hashPart;
+        // Actualizar el hash de la URL con todos los parámetros solo si se indica
+        if (updateHash) {
+            var hashPart = shareUrl.split(window.location.pathname)[1];
+            if (window.location.hash !== hashPart && hashPart && hashPart !== '#') {
+                window.location.hash = hashPart;
+            }
         }
     }
 
@@ -430,7 +432,6 @@
     }
 
     // --- INICIO: Sincronizar select con hash de la URL ---
-    // Actualiza el hash al cambiar la opción
     document.addEventListener('DOMContentLoaded', function() {
         var type = 'url';
         var hash = window.location.hash.replace('#', '');
@@ -465,9 +466,9 @@
         // Actualizar el valor oculto
         document.getElementById('type').value = btn.getAttribute('data-type');
         changePlaceholder();
-        // Actualizar el hash de la URL solo si se indica
+        // Actualizar el hash de la URL y QR solo si se indica
         if (updateHash) {
-            generateQRCode(); // Esto actualizará el hash completo
+            generateQRCode(true); // Esto actualizará el hash completo
         }
         // Enfocar el campo principal
         var contentInput = document.getElementById('content');
@@ -489,7 +490,7 @@
             // Seleccionar tipo
             var btns = document.querySelectorAll('#type-btn-group button');
             var btn = Array.from(btns).find(b => b.getAttribute('data-type') === mainHash);
-            if (btn) selectQRType(btn);
+            if (btn) selectQRType(btn, false); // No actualizar hash aquí
             // Llenar campos
             setTimeout(function() {
                 if (params['1']) document.getElementById('content').value = params['1'];
@@ -511,7 +512,7 @@
                         break;
                 }
                 if (params['s']) document.getElementById('size').value = params['s'];
-                generateQRCode();
+                generateQRCode(false); // No actualizar hash aquí
                 // Mostrar el cuadro del enlace para compartir si hay parámetros
                 var shareUrlContainer = document.getElementById('share-url-container');
                 var shareUrlInput = document.getElementById('share-url');
