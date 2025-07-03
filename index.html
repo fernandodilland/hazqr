@@ -225,11 +225,24 @@
 
         // Mostrar el botón de compartir cuando se genera el QR y actualizar su enlace
         var shareLink = document.getElementById("share-link");
-        shareLink.dataset.url = generateShareURL();
+        var shareUrl = generateShareURL();
+        shareLink.dataset.url = shareUrl;
         shareLink.style.display = "block";
         shareLink.innerHTML = 'Compartir';
         var downloadLink = document.getElementById("download-link");
         downloadLink.innerHTML = 'Descargar';
+
+        // Mostrar el enlace generado automáticamente
+        var shareUrlContainer = document.getElementById('share-url-container');
+        var shareUrlInput = document.getElementById('share-url');
+        shareUrlInput.value = shareUrl;
+        shareUrlContainer.style.display = 'block';
+
+        // Actualizar el hash de la URL con todos los parámetros
+        var hashPart = shareUrl.split(window.location.pathname)[1];
+        if (window.location.hash !== hashPart) {
+            window.location.hash = hashPart;
+        }
     }
 
     // Genera la URL para compartir el QR con los datos actuales
@@ -427,10 +440,11 @@
             options.hidden = false;
         }
         if (hash) {
-            var btn = Array.from(btns).find(b => b.getAttribute('data-type') === hash);
+            var mainHash = hash.split('&')[0];
+            var btn = Array.from(btns).find(b => b.getAttribute('data-type') === mainHash);
             if (btn) {
-                selectQRType(btn);
-                type = hash;
+                selectQRType(btn, false); // No actualizar hash aquí
+                type = mainHash;
             }
         }
         // Enfocar automáticamente el campo de información al cargar la página
@@ -442,7 +456,7 @@
     // --- FIN: Sincronizar select con hash de la URL ---
 
     // --- NUEVO: Manejo de botones para tipo de QR ---
-    function selectQRType(btn) {
+    function selectQRType(btn, updateHash = true) {
         // Quitar la clase 'active' de todos los botones
         var btns = document.querySelectorAll('#type-btn-group button');
         btns.forEach(function(b) { b.classList.remove('active'); });
@@ -451,8 +465,10 @@
         // Actualizar el valor oculto
         document.getElementById('type').value = btn.getAttribute('data-type');
         changePlaceholder();
-        // Actualizar el hash de la URL
-        window.location.hash = '#' + btn.getAttribute('data-type');
+        // Actualizar el hash de la URL solo si se indica
+        if (updateHash) {
+            generateQRCode(); // Esto actualizará el hash completo
+        }
         // Enfocar el campo principal
         var contentInput = document.getElementById('content');
         if (contentInput) {
