@@ -156,10 +156,10 @@
               </div>
               <div class="download-button row g-2 justify-content-center">
                   <div class="col-12 col-md-6 d-grid">
-                    <a id="download-link" class="btn btn-primary" href="#" download="qr.png" style="display: none;"><i class="fas fa-download"></i> Descargar</a>
+                    <a id="download-link" class="btn btn-primary" href="#" download="qr.png" style="display: none;">Descargar</a>
                   </div>
                   <div class="col-12 col-md-6 d-grid">
-                    <button id="share-link" class="btn btn-outline-secondary" style="display: none;" onclick="copyShareURL(event)"><i class="fas fa-share"></i> Compartir</button>
+                    <button id="share-link" class="btn btn-outline-secondary" style="display: none;" onclick="copyShareURL(event)">Compartir</button>
                   </div>
               </div>
               <div id="share-url-container" class="mt-2" style="display:none;">
@@ -227,9 +227,9 @@
         var shareLink = document.getElementById("share-link");
         shareLink.dataset.url = generateShareURL();
         shareLink.style.display = "block";
-        shareLink.innerHTML = '<i class="fas fa-share"></i> Compartir';
+        shareLink.innerHTML = 'Compartir';
         var downloadLink = document.getElementById("download-link");
-        downloadLink.innerHTML = '<i class="fas fa-download"></i> Descargar';
+        downloadLink.innerHTML = 'Descargar';
     }
 
     // Genera la URL para compartir el QR con los datos actuales
@@ -461,7 +461,6 @@
     }
     // --- NUEVO: Llenar campos desde la URL si hay parámetros ---
     document.addEventListener('DOMContentLoaded', function() {
-        // ...existing code...
         // --- NUEVO: Llenar campos desde la URL si hay parámetros ---
         var hash = window.location.hash;
         if (hash && hash.includes('&')) {
@@ -497,7 +496,15 @@
                 }
                 if (params['s']) document.getElementById('size').value = params['s'];
                 generateQRCode();
-            }, 100); // Espera breve para que los campos existan
+                // Mostrar el cuadro del enlace para compartir si hay parámetros
+                var shareUrlContainer = document.getElementById('share-url-container');
+                var shareUrlInput = document.getElementById('share-url');
+                var shareLink = document.getElementById('share-link');
+                if (shareLink && shareLink.dataset.url) {
+                    shareUrlInput.value = shareLink.dataset.url;
+                    shareUrlContainer.style.display = 'block';
+                }
+            }, 150); // Espera breve para que los campos existan
         }
     });
     function copyShareURL(e) {
@@ -510,8 +517,9 @@
         shareUrlInput.value = url;
         shareUrlContainer.style.display = 'block';
         // Cambiar el hash de la URL actual para que el enlace sea visible en la barra de direcciones
-        if (window.location.hash !== url.split(window.location.pathname)[1]) {
-            window.location.hash = url.split(window.location.pathname)[1];
+        var hashPart = url.split(window.location.pathname)[1];
+        if (window.location.hash !== hashPart) {
+            window.location.hash = hashPart;
         }
         if (navigator.clipboard) {
             navigator.clipboard.writeText(url).then(function() {
