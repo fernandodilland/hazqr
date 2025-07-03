@@ -21,7 +21,7 @@
     <title>Generador de Códigos QR Gratis, WhatsApp, Links</title>
 
     <link href="recursos/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="recursos/detalles.css">
     <link rel="stylesheet" href="recursos/animated.css">
     <link rel="stylesheet" href="recursos/owl.css">
@@ -46,6 +46,18 @@
             max-width: 800px;
             max-height: 800px;
             margin: 0 auto;
+        }
+
+        /* Espaciado entre botones de tipo QR */
+        .type-btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem 0.75rem; /* vertical horizontal */
+            margin-bottom: 1rem;
+        }
+        .type-btn-group .btn {
+            min-width: 120px;
+            margin: 0;
         }
 
         @font-face {
@@ -89,18 +101,19 @@
                 <br>
                 <div class="container">
                   <div class="options">
-                      <label for="type">Seleccione el tipo de código QR:</label><br>
-                      <select class="form-control" id="type" name="type" onchange="changePlaceholder()">
-                          <option value="url">URL</option>
-                          <option value="whatsapp">WhatsApp</option>
-                          <option value="drive">Menú digital (Google Drive)</option>
-                          <option value="sms">Mensaje de texto SMS</option>
-                          <option value="phone">Teléfono</option>
-                          <option value="text">Texto simple</option>
-                          <option value="location">Geolocalización</option>
-                          <option value="wifi">Red Wifi</option>
-                          <option value="maps">Google Maps</option>
-                      </select><br>
+                      <label>Seleccione el tipo de código QR:</label><br>
+                      <div id="type-btn-group" class="type-btn-group" role="group">
+                          <button type="button" class="btn btn-outline-primary active" data-type="url" onclick="selectQRType(this)"><i class="fas fa-link"></i> URL</button>
+                          <button type="button" class="btn btn-outline-primary" data-type="whatsapp" onclick="selectQRType(this)"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                          <button type="button" class="btn btn-outline-primary" data-type="drive" onclick="selectQRType(this)"><i class="fas fa-folder-open"></i> Menú digital</button>
+                          <button type="button" class="btn btn-outline-primary" data-type="sms" onclick="selectQRType(this)"><i class="fas fa-comment-alt"></i> SMS</button>
+                          <button type="button" class="btn btn-outline-primary" data-type="phone" onclick="selectQRType(this)"><i class="fas fa-phone"></i> Teléfono</button>
+                          <button type="button" class="btn btn-outline-primary" data-type="text" onclick="selectQRType(this)"><i class="fas fa-font"></i> Texto</button>
+                          <button type="button" class="btn btn-outline-primary" data-type="location" onclick="selectQRType(this)"><i class="fas fa-map-marker-alt"></i> Geolocalización</button>
+                          <button type="button" class="btn btn-outline-primary" data-type="wifi" onclick="selectQRType(this)"><i class="fas fa-wifi"></i> WiFi</button>
+                          <button type="button" class="btn btn-outline-primary" data-type="maps" onclick="selectQRType(this)"><i class="fas fa-map"></i> Google Maps</button>
+                      </div>
+                      <input type="hidden" id="type" name="type" value="url">
                       <label for="content">Ingrese la información:</label><br>
                       <input class="form-control" type="text" id="content" name="content" placeholder="https://"><br>
                       <div id="additional-fields"></div>
@@ -179,20 +192,19 @@
 
     // Función para generar el valor del código QR en base al tipo seleccionado
     function generateQRValue() {
-        var typeSelect = document.getElementById("type");
-        var contentInput = document.getElementById("content");
-        var additionalFields = document.getElementById("additional-fields");
-
-        switch (typeSelect.value) {
+        var type = document.getElementById('type').value;
+        var contentInput = document.getElementById('content');
+        var additionalFields = document.getElementById('additional-fields');
+        switch (type) {
             case "url":
                 return addHTTPProtocol(contentInput.value);
             case "whatsapp":
                 var phoneNumber = contentInput.value;
-                var message = additionalFields.querySelector("#whatsapp-message").value;
+                var message = additionalFields.querySelector("#whatsapp-message")?.value;
                 return generateWhatsAppLink(phoneNumber, message);
             case "sms":
                 var phoneNumber = contentInput.value;
-                var message = additionalFields.querySelector("#sms-message").value;
+                var message = additionalFields.querySelector("#sms-message")?.value;
                 return generateSMSLink(phoneNumber, message);
             case "phone":
                 return "tel:" + contentInput.value;
@@ -200,16 +212,16 @@
                 return contentInput.value;
             case "location":
                 var latitude = contentInput.value;
-                var longitude = additionalFields.querySelector("#location-longitude").value;
+                var longitude = additionalFields.querySelector("#location-longitude")?.value;
                 return generateGeoLocationLink(latitude, longitude);
             case "wifi":
                 var wifiName = contentInput.value;
-                var wifiPassword = additionalFields.querySelector("#wifi-password").value;
-                var wifiSecurity = additionalFields.querySelector("#wifi-security").value;
+                var wifiPassword = additionalFields.querySelector("#wifi-password")?.value;
+                var wifiSecurity = additionalFields.querySelector("#wifi-security")?.value;
                 return generateWifiLink(wifiName, wifiPassword, wifiSecurity);
             case "drive":
                 return contentInput.value;
-            case "maps": // Nueva opción agregada
+            case "maps":
                 return generateGoogleMapsLink(contentInput.value);
             default:
                 return addHTTPProtocol(contentInput.value);
@@ -218,11 +230,10 @@
 
     // Función para cambiar el marcador de posición según el tipo seleccionado
     function changePlaceholder() {
-        var typeSelect = document.getElementById("type");
-        var contentInput = document.getElementById("content");
-        var additionalFields = document.getElementById("additional-fields");
-
-        switch (typeSelect.value) {
+        var type = document.getElementById('type').value;
+        var contentInput = document.getElementById('content');
+        var additionalFields = document.getElementById('additional-fields');
+        switch (type) {
             case "url":
                 contentInput.placeholder = "Dirección URL";
                 additionalFields.innerHTML = "";
@@ -268,7 +279,7 @@
                 contentInput.placeholder = "https://drive.google.com/drive/folders/...";
                 additionalFields.innerHTML = "";
                 break;
-            case "maps": // Nueva opción agregada
+            case "maps":
                 contentInput.placeholder = "Dirección";
                 additionalFields.innerHTML = "";
                 break;
@@ -329,28 +340,37 @@
     // --- INICIO: Sincronizar select con hash de la URL ---
     // Actualiza el hash al cambiar la opción
     document.addEventListener('DOMContentLoaded', function() {
-        var typeSelect = document.getElementById('type');
-        var contentInput = document.getElementById('content');
+        var type = 'url';
+        var hash = window.location.hash.replace('#', '');
+        var btns = document.querySelectorAll('#type-btn-group button');
+        if (hash) {
+            var btn = Array.from(btns).find(b => b.getAttribute('data-type') === hash);
+            if (btn) {
+                selectQRType(btn);
+                type = hash;
+            }
+        }
         // Enfocar automáticamente el campo de información al cargar la página
+        var contentInput = document.getElementById('content');
         if (contentInput) {
             contentInput.focus();
         }
-        // Al cambiar el select, actualiza el hash
-        typeSelect.addEventListener('change', function() {
-            window.location.hash = '#' + typeSelect.value;
-        });
-
-        // Al cargar la página, si hay hash, selecciona la opción correspondiente
-        var hash = window.location.hash.replace('#', '');
-        if (hash) {
-            var option = Array.from(typeSelect.options).find(opt => opt.value === hash);
-            if (option) {
-                typeSelect.value = hash;
-                changePlaceholder(); // Actualiza placeholder y campos adicionales
-            }
-        }
     });
     // --- FIN: Sincronizar select con hash de la URL ---
+
+    // --- NUEVO: Manejo de botones para tipo de QR ---
+    function selectQRType(btn) {
+        // Quitar la clase 'active' de todos los botones
+        var btns = document.querySelectorAll('#type-btn-group button');
+        btns.forEach(function(b) { b.classList.remove('active'); });
+        // Agregar la clase 'active' al botón seleccionado
+        btn.classList.add('active');
+        // Actualizar el valor oculto
+        document.getElementById('type').value = btn.getAttribute('data-type');
+        changePlaceholder();
+        // Actualizar el hash de la URL
+        window.location.hash = '#' + btn.getAttribute('data-type');
+    }
   </script>
 
 </body>
