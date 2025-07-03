@@ -330,6 +330,11 @@
     // Actualiza el hash al cambiar la opción
     document.addEventListener('DOMContentLoaded', function() {
         var typeSelect = document.getElementById('type');
+        var contentInput = document.getElementById('content');
+        // Enfocar automáticamente el campo de información al cargar la página
+        if (contentInput) {
+            contentInput.focus();
+        }
         // Al cambiar el select, actualiza el hash
         typeSelect.addEventListener('change', function() {
             window.location.hash = '#' + typeSelect.value;
