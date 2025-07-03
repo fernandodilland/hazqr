@@ -375,6 +375,11 @@
         changePlaceholder();
         // Actualizar el hash de la URL
         window.location.hash = '#' + btn.getAttribute('data-type');
+        // Enfocar el campo principal
+        var contentInput = document.getElementById('content');
+        if (contentInput) {
+            contentInput.focus();
+        }
     }
   </script>
 
