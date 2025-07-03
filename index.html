@@ -87,6 +87,7 @@
         footer {
             flex-shrink: 0;
         }
+
     </style>
   </head>
 <body>
@@ -100,7 +101,7 @@
                 <h2>Haz tu <em>Código QR</em></h2>
                 <br>
                 <div class="container">
-                  <div class="options">
+                  <div class="options" hidden>
                       <label>Seleccione el tipo de código QR:</label><br>
                       <div id="type-btn-group" class="type-btn-group" role="group">
                           <button type="button" class="btn btn-outline-primary active" data-type="url" onclick="selectQRType(this)"><i class="fas fa-link"></i> URL</button>
@@ -354,6 +355,11 @@
         var contentInput = document.getElementById('content');
         if (contentInput) {
             contentInput.focus();
+        }
+        // Mostrar las opciones después de procesar el hash
+        var options = document.querySelector('.options');
+        if (options) {
+            options.hidden = false;
         }
     });
     // --- FIN: Sincronizar select con hash de la URL ---
